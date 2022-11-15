@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSavedCountries } from '../lib/countriesState';
 import { useNavigation } from '@react-navigation/native';
 import { AddRemoveButtons } from '../Components/AddRemoveButtons';
+import { NoCountries } from '../Components/NoCountries';
 
 const ScreenContainer = styled.View`
   flex: 1;
@@ -56,20 +57,10 @@ const WishlistScreen = () => {
         //  style={{ width: Dimensions.get('window').width }}
         style={{ flex: 1 }}
       > */}
-      <Search
-        searchHandler={setSearchTerm}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      />
+      <Search searchHandler={setSearchTerm} />
       <View style={{ flex: 1, width: '100%' }}>
         {!wishlistCountries.length ? (
-          <>
-            <Text>You have no countries on your wishlist!</Text>
-            <Text>Try adding some from the Countries tab!</Text>
-          </>
+          <NoCountries screen="Wishlist" />
         ) : !noCountriesFound ? (
           <CountriesList
             countriesList={

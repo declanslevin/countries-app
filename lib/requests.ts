@@ -1,9 +1,13 @@
+import { trackPromise } from 'react-promise-tracker';
+
 const fetchAllCountries = async () => {
   const request = new Request('https://restcountries.com/v3.1/all');
-  const result = fetch(request)
-    .then((res) => res.json())
-    .then((data) => data)
-    .catch((err) => console.log(err));
+  const result = trackPromise(
+    fetch(request)
+      .then((res) => res.json())
+      .then((data) => data)
+      .catch((err) => console.log(err))
+  );
   return result;
 };
 

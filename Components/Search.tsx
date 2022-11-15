@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react';
 
 interface SearchProps {
   searchHandler: React.Dispatch<React.SetStateAction<string>>;
-  style: React.CSSProperties;
 }
 
 const SearchContainer = styled.View`
@@ -14,7 +13,7 @@ const SearchContainer = styled.View`
   padding: 0 8px;
 `;
 
-const Search = ({ searchHandler, style }: SearchProps) => {
+const Search = ({ searchHandler }: SearchProps) => {
   const [searchText, setSearchText] = useState<string>('');
 
   const handlePress = () => {
@@ -26,7 +25,18 @@ const Search = ({ searchHandler, style }: SearchProps) => {
   }, [searchText]);
 
   return (
-    <SearchContainer style={style}>
+    <SearchContainer
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: 'powderblue',
+        borderTopColor: 'steelblue',
+        borderTopWidth: 1,
+        borderBottomColor: 'steelblue',
+        borderBottomWidth: 1,
+      }}
+    >
       <View style={{ flex: 1, flexDirection: 'row' }}>
         <FontAwesome
           name="search"

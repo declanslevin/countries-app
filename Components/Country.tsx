@@ -59,7 +59,9 @@ const Country = ({ country }: { country: CountryType }) => {
             justifyContent: 'space-between',
             padding: 10,
           },
-          selectedCountries.includes(country) && { backgroundColor: 'green' },
+          selectedCountries.includes(country) && {
+            backgroundColor: 'steelblue',
+          },
         ]}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -75,7 +77,11 @@ const Country = ({ country }: { country: CountryType }) => {
             }}
           />
           {/* <Flag source={flag} avatar /> */}
-          <Text>{name}</Text>
+          <Text
+            style={[selectedCountries.includes(country) && { color: 'white' }]}
+          >
+            {name}
+          </Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {visitedCountries.includes(country) && (

@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AddRemoveButtons } from '../Components/AddRemoveButtons';
 import { CountriesList } from '../Components/CountriesList';
 import { Filter } from '../Components/Filter';
 import { Search } from '../Components/Search';
+import { Spinner } from '../Components/Spinner';
 import { fetchAllCountries } from '../lib/requests';
 import { useSavedCountries } from '../lib/countriesState';
 import { getAllCountries, storeAllCountries } from '../lib/localStorage';
 import { CountryType } from '../types';
 import styled from 'styled-components/native';
+import { usePromiseTracker } from 'react-promise-tracker';
 
 interface CountryDataType {
   name: {
@@ -30,7 +32,6 @@ interface CountryDataType {
 
 const ScreenContainer = styled.SafeAreaView`
   flex: 1;
-  background-color: 'white';
   align-items: center;
   justify-content: center;
 `;
@@ -46,6 +47,8 @@ const CountriesScreen = () => {
   const [wishlistActive, setWishlistActive] = useState<boolean>(false);
 
   const [noCountriesFound, setNoCountriesFound] = useState<boolean>(false);
+
+  const { promiseInProgress } = usePromiseTracker();
 
   const {
     clearSelected,
@@ -96,29 +99,32 @@ const CountriesScreen = () => {
   useEffect(() => {
     if (!countriesList) {
       setCountriesList(allCountries);
-    } else {
-      if (!visitedActive && !wishlistActive) {
-        setCountriesList(allCountries);
-      } else if (visitedActive && !wishlistActive) {
-        setCountriesList(
-          allCountries?.filter((country) => !visitedCountries.includes(country))
-        );
-      } else if (!visitedActive && wishlistActive) {
-        setCountriesList(
-          allCountries?.filter(
-            (country) => !wishlistCountries.includes(country)
-          )
-        );
-      } else if (visitedActive && wishlistActive) {
-        setCountriesList(
-          allCountries?.filter(
-            (country) =>
-              !visitedCountries.includes(country) &&
-              !wishlistCountries.includes(country)
-          )
-        );
-      }
     }
+  }, [allCountries]);
+
+  useEffect(() => {
+    if (!visitedActive && !wishlistActive) {
+      setCountriesList(allCountries);
+    } else if (visitedActive && !wishlistActive) {
+      setCountriesList(
+        allCountries?.filter((country) => !visitedCountries.includes(country))
+      );
+    } else if (!visitedActive && wishlistActive) {
+      setCountriesList(
+        allCountries?.filter((country) => !wishlistCountries.includes(country))
+      );
+    } else if (visitedActive && wishlistActive) {
+      setCountriesList(
+        allCountries?.filter(
+          (country) =>
+            !visitedCountries.includes(country) &&
+            !wishlistCountries.includes(country)
+        )
+      );
+    }
+  }, [wishlistActive, visitedActive]);
+
+  useEffect(() => {
     if (searchTerm && countriesList) {
       const search = countriesList.filter(
         (country) =>
@@ -135,46 +141,34 @@ const CountriesScreen = () => {
       setSearchCountries([]);
       setNoCountriesFound(false);
     }
-  }, [
-    allCountries,
-    searchTerm,
-    wishlistActive,
-    wishlistCountries,
-    visitedActive,
-    visitedCountries,
-  ]);
+  }, [searchTerm]);
 
   return (
     <ScreenContainer>
-      <Search
-        searchHandler={setSearchTerm}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottomWidth: 1,
-          borderBottomColor: 'black',
-        }}
-      />
+      <Search searchHandler={setSearchTerm} />
       <Filter
         visitedActive={visitedActive}
         wishlistActive={wishlistActive}
         setVisitedActive={setVisitedActive}
         setWishlistActive={setWishlistActive}
       />
-      <View style={{ flex: 1, width: '100%' }}>
-        {countriesList && !noCountriesFound ? (
-          <CountriesList
-            countriesList={
-              !searchCountries.length ? countriesList : searchCountries
-            }
-          />
-        ) : noCountriesFound ? (
-          <Text>No countries found that match your search!</Text>
-        ) : (
-          <Text>Oops! Unable to return list of all countries!</Text>
-        )}
-      </View>
+      {promiseInProgress ? (
+        <Spinner />
+      ) : (
+        <View style={{ flex: 1, width: '100%' }}>
+          {countriesList && !noCountriesFound ? (
+            <CountriesList
+              countriesList={
+                !searchCountries.length ? countriesList : searchCountries
+              }
+            />
+          ) : noCountriesFound ? (
+            <Text>No countries found that match your search!</Text>
+          ) : (
+            <Text>Oops! Unable to return list of all countries!</Text>
+          )}
+        </View>
+      )}
       {selectedCountries.length ? (
         <AddRemoveButtons screen="AllCountries" />
       ) : null}

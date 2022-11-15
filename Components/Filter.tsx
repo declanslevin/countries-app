@@ -26,6 +26,8 @@ const Filter = ({
         width: '100%',
         flexDirection: 'row',
         height: 40,
+        borderBottomWidth: 1,
+        borderBottomColor: 'steelblue',
       }}
     >
       <Pressable
@@ -33,16 +35,22 @@ const Filter = ({
           {
             flex: 1,
             borderRightWidth: 1,
-            borderRightColor: 'black',
           },
-          visitedActive && { backgroundColor: 'green' },
+          visitedActive
+            ? { backgroundColor: 'steelblue' }
+            : { backgroundColor: 'skyblue' },
+          visitedActive && wishlistActive
+            ? { borderRightColor: 'white' }
+            : { borderRightColor: 'steelblue' },
         ]}
         onPress={handleVisited}
       >
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
         >
-          <Text>Filter Visited</Text>
+          <Text style={[visitedActive && { color: 'white' }]}>
+            Filter Visited
+          </Text>
         </View>
       </Pressable>
       <Pressable
@@ -51,14 +59,18 @@ const Filter = ({
             flex: 1,
             alignItems: 'center',
           },
-          wishlistActive && { backgroundColor: 'green' },
+          wishlistActive
+            ? { backgroundColor: 'steelblue' }
+            : { backgroundColor: 'skyblue' },
         ]}
         onPress={handleWishlist}
       >
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
         >
-          <Text>Filter Wishlist</Text>
+          <Text style={[wishlistActive && { color: 'white' }]}>
+            Filter Wishlist
+          </Text>
         </View>
       </Pressable>
     </View>

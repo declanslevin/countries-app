@@ -47,39 +47,100 @@ const AddRemoveButtons = ({ screen }: AddRemoveButtonsProps) => {
   return (
     <>
       {(screen as string) === 'AllCountries' ? (
-        <View style={{ flexDirection: 'row', paddingVertical: 8 }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            height: 40,
+            borderTopWidth: 1,
+            borderTopColor: 'steelblue',
+            borderBottomWidth: 1,
+            borderBottomColor: 'steelblue',
+          }}
+        >
           <Pressable
-            style={{ flex: 1, borderRightWidth: 1, borderRightColor: 'black' }}
+            style={({ pressed }) => [
+              {
+                flex: 1,
+                borderRightWidth: 1,
+                borderRightColor: 'steelblue',
+                backgroundColor: pressed ? 'steelblue' : 'skyblue',
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+            ]}
             onPress={handleAddToVisited}
           >
-            <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text>Add {count} to Visited</Text>
-            </View>
+            {({ pressed }) => (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text style={[{ color: pressed ? 'white' : 'black' }]}>
+                  Add {count} to Visited
+                </Text>
+              </View>
+            )}
           </Pressable>
           <Pressable
-            style={{ flex: 1, alignItems: 'center' }}
+            style={({ pressed }) => [
+              {
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: pressed ? 'steelblue' : 'skyblue',
+              },
+            ]}
             onPress={handleAddToWishlist}
           >
-            <View>
-              <Text>Add {count} to Wishlist</Text>
-            </View>
+            {({ pressed }) => (
+              <View>
+                <Text style={[{ color: pressed ? 'white' : 'black' }]}>
+                  Add {count} to Wishlist
+                </Text>
+              </View>
+            )}
           </Pressable>
         </View>
       ) : (
-        <Pressable
-          style={{ flex: 1 }}
-          onPress={
-            screen === 'Visited'
-              ? handleRemoveFromVisited
-              : handleRemoveFromWishlist
-          }
+        <View
+          style={{
+            height: 40,
+            width: '100%',
+            borderTopWidth: 1,
+            borderTopColor: 'steelblue',
+            borderBottomWidth: 1,
+            borderBottomColor: 'steelblue',
+          }}
         >
-          <View style={{ flex: 1, alignItems: 'center', paddingVertical: 8 }}>
-            <Text>
-              Remove {count} from {screen}
-            </Text>
-          </View>
-        </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              {
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: pressed ? 'steelblue' : 'skyblue',
+              },
+            ]}
+            onPress={
+              screen === 'Visited'
+                ? handleRemoveFromVisited
+                : handleRemoveFromWishlist
+            }
+          >
+            {({ pressed }) => (
+              <View
+                style={{ flex: 1, alignItems: 'center', paddingVertical: 8 }}
+              >
+                <Text style={[{ color: pressed ? 'white' : 'black' }]}>
+                  Remove {count} from {screen}
+                </Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
       )}
     </>
   );

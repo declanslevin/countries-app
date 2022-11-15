@@ -103,13 +103,27 @@ export default function App() {
   return (
     <SavedCountriesProvider>
       <NavigationContainer>
-        <TabNav.Navigator screenOptions={{ headerShown: false }}>
+        <TabNav.Navigator
+          screenOptions={{
+            headerShown: false,
+            tabBarActiveBackgroundColor: 'steelblue',
+            tabBarActiveTintColor: 'white',
+            tabBarInactiveBackgroundColor: 'skyblue',
+            tabBarInactiveTintColor: 'black',
+          }}
+        >
           <TabNav.Screen
             name="CountriesTab"
             component={CountriesTab}
             options={{
               title: 'Countries',
-              tabBarIcon: () => <Entypo name="globe" size={24} color="black" />,
+              tabBarIcon: ({ focused }) => (
+                <Entypo
+                  name="globe"
+                  size={24}
+                  color={focused ? 'white' : 'black'}
+                />
+              ),
             }}
           />
           <TabNav.Screen
@@ -117,11 +131,11 @@ export default function App() {
             component={VisitedTab}
             options={{
               title: 'Visited',
-              tabBarIcon: () => (
+              tabBarIcon: ({ focused }) => (
                 <MaterialCommunityIcons
                   name="playlist-check"
                   size={24}
-                  color="black"
+                  color={focused ? 'white' : 'black'}
                 />
               ),
             }}
@@ -131,11 +145,11 @@ export default function App() {
             component={WishlistTab}
             options={{
               title: 'Wishlist',
-              tabBarIcon: () => (
+              tabBarIcon: ({ focused }) => (
                 <MaterialCommunityIcons
                   name="playlist-edit"
                   size={24}
-                  color="black"
+                  color={focused ? 'white' : 'black'}
                 />
               ),
             }}
@@ -144,7 +158,13 @@ export default function App() {
             name="Map"
             component={MapTab}
             options={{
-              tabBarIcon: () => <Entypo name="map" size={24} color="black" />,
+              tabBarIcon: ({ focused }) => (
+                <Entypo
+                  name="map"
+                  size={24}
+                  color={focused ? 'white' : 'black'}
+                />
+              ),
             }}
           />
         </TabNav.Navigator>

@@ -8,6 +8,7 @@ import { useSavedCountries } from '../lib/countriesState';
 import { useNavigation } from '@react-navigation/native';
 import { AddRemoveButtons } from '../Components/AddRemoveButtons';
 import { getVisitedCountries } from '../lib/localStorage';
+import { NoCountries } from '../Components/NoCountries';
 
 const ScreenContainer = styled.View`
   flex: 1;
@@ -73,16 +74,11 @@ const VisitedScreen = () => {
         //  style={{ width: Dimensions.get('window').width }}
         style={{ flex: 1 }}
       > */}
-      <Search
-        searchHandler={setSearchTerm}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      />
+      <Search searchHandler={setSearchTerm} />
       <View style={{ flex: 1, width: '100%' }}>
-        {countriesList && !noCountriesFound ? (
+        {!countriesList?.length ? (
+          <NoCountries screen="Visited" />
+        ) : !noCountriesFound ? (
           <CountriesList
             countriesList={
               !searchCountries.length ? countriesList : searchCountries
