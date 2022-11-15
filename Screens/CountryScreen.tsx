@@ -1,9 +1,13 @@
-import { Button, View, Text, Linking, Alert, Image } from 'react-native';
+import { Button, Linking, Alert, Image, Dimensions } from 'react-native';
 import styled from 'styled-components/native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
 import React, { useCallback, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import MapView from 'react-native-maps';
+import { ScrollView } from 'react-native-gesture-handler';
+import Geocoder from 'react-native-geocoding';
+import Constants from 'expo-constants';
 
 type CountryScreenRouteProp = RouteProp<RootStackParamList, 'Country'>;
 
@@ -15,7 +19,6 @@ type StyledFlagProps = {
 const ScreenContainer = styled.View`
   flex: 1;
   background-color: lightblue;
-  padding: 32px 12px;
 `;
 
 const FlagContainer = styled.View`
@@ -83,36 +86,79 @@ const OpenURLButton = ({ url, title }: { url: string; title: string }) => {
 
 const CountryScreen = () => {
   const route: CountryScreenRouteProp = useRoute();
-  const { flag, official, population, capital, continents, map } = route.params;
+  const {
+    flag,
+    official,
+    population,
+    capital,
+    continents,
+    map,
+    latitude,
+    longitude,
+  } = route.params;
+  const [lat, setLat] = useState<number>(latitude);
+  const [lng, setLng] = useState<number>(longitude);
+  const [latDelta, setLatDelta] = useState<number>();
+  const [lngDelta, setLngDelta] = useState<number>();
+
+  const GOOGLE_MAPS_API_KEY = Constants.expoConfig?.extra?.googleMapsApiKey;
+  Geocoder.init(GOOGLE_MAPS_API_KEY);
+  Geocoder.from(route.params.name)
+    .then((json) => {
+      const location = json.results[0].geometry.location;
+      const viewport = json.results[0].geometry.viewport;
+      const bounds = json.results[0].geometry.bounds;
+      console.log(bounds);
+      setLat(location.lat);
+      setLng(location.lng);
+      setLatDelta(viewport.northeast.lat - viewport.southwest.lat);
+      setLngDelta(viewport.northeast.lng - viewport.southwest.lng);
+    })
+    .catch((err) => console.warn(err));
+
   return (
     <ScreenContainer>
-      <SafeAreaView style={{ flex: 1 }}>
-        <FlagContainer>
-          <Flag source={flag} resize="contain" />
-        </FlagContainer>
-        <TextContainer>
-          <TextLabel>Official Name: </TextLabel>
-          <StyledText style={{ flex: 1, flexWrap: 'wrap' }}>
-            {official}
-          </StyledText>
-        </TextContainer>
-        <TextContainer>
-          <TextLabel>Population: </TextLabel>
-          <StyledText>
-            {population.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-          </StyledText>
-        </TextContainer>
-        <TextContainer>
-          <TextLabel>Capital City: </TextLabel>
-          <StyledText>{capital}</StyledText>
-        </TextContainer>
-        <TextContainer>
-          <TextLabel>Continent: </TextLabel>
-          <StyledText>{continents}</StyledText>
-        </TextContainer>
-        <ButtonContainer>
-          <OpenURLButton url={map} title="Google Maps" />
-        </ButtonContainer>
+      <SafeAreaView edges={['bottom', 'left', 'right']} style={{ flex: 1 }}>
+        <ScrollView style={{ marginBottom: 20 }}>
+          <MapView
+            style={{
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').height / 3,
+            }}
+            region={{
+              latitude: lat,
+              longitude: lng,
+              latitudeDelta: latDelta || 5,
+              longitudeDelta: lngDelta || 5,
+            }}
+          />
+          <FlagContainer>
+            <Flag source={flag} resize="contain" />
+          </FlagContainer>
+          <TextContainer>
+            <TextLabel>Official Name: </TextLabel>
+            <StyledText style={{ flex: 1, flexWrap: 'wrap' }}>
+              {official}
+            </StyledText>
+          </TextContainer>
+          <TextContainer>
+            <TextLabel>Population: </TextLabel>
+            <StyledText>
+              {population.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+            </StyledText>
+          </TextContainer>
+          <TextContainer>
+            <TextLabel>Capital City: </TextLabel>
+            <StyledText>{capital}</StyledText>
+          </TextContainer>
+          <TextContainer>
+            <TextLabel>Continent: </TextLabel>
+            <StyledText>{continents}</StyledText>
+          </TextContainer>
+          <ButtonContainer>
+            <OpenURLButton url={map} title="View on Google Maps" />
+          </ButtonContainer>
+        </ScrollView>
       </SafeAreaView>
     </ScreenContainer>
   );

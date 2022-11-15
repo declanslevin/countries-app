@@ -3,22 +3,18 @@ interface CountryType {
   flag: string;
   official: string;
   population: number;
-  capital: string;
-  continents: string;
+  capital: string[];
+  continents: string[];
   map: string;
+  latitude: number;
+  longitude: number;
 }
 
 type RootStackParamList = {
+  Visited: undefined;
+  Wishlist: undefined;
   Countries: undefined;
-  Country: {
-    name: string;
-    flag: string;
-    official: string;
-    population: number;
-    capital: string;
-    continents: string;
-    map: string;
-  };
+  Country: CountryType;
 };
 
 export { CountryType, RootStackParamList };
