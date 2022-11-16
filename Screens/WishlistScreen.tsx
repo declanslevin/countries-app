@@ -9,6 +9,7 @@ import { useSavedCountries } from '../lib/countriesState';
 import { useNavigation } from '@react-navigation/native';
 import { AddRemoveButtons } from '../Components/AddRemoveButtons';
 import { NoCountries } from '../Components/NoCountries';
+import { EmptySearch } from '../Components/EmptySearch';
 
 const ScreenContainer = styled.View`
   flex: 1;
@@ -68,7 +69,7 @@ const WishlistScreen = () => {
             }
           />
         ) : noCountriesFound ? (
-          <Text>No countries found that match your search!</Text>
+          <EmptySearch />
         ) : (
           <Text>Oops! Unable to return list of all countries!</Text>
         )}

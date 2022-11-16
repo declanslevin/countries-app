@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AddRemoveButtons } from '../Components/AddRemoveButtons';
 import { CountriesList } from '../Components/CountriesList';
@@ -12,6 +12,8 @@ import { getAllCountries, storeAllCountries } from '../lib/localStorage';
 import { CountryType } from '../types';
 import styled from 'styled-components/native';
 import { usePromiseTracker } from 'react-promise-tracker';
+import { EmptySearch } from '../Components/EmptySearch';
+import { ErrorScreen } from '../Components/Error';
 
 interface CountryDataType {
   name: {
@@ -93,7 +95,7 @@ const CountriesScreen = () => {
   }, [navigation]);
 
   useEffect(() => {
-    fetchCountries();
+    // fetchCountries();
   }, []);
 
   useEffect(() => {
@@ -163,9 +165,12 @@ const CountriesScreen = () => {
               }
             />
           ) : noCountriesFound ? (
-            <Text>No countries found that match your search!</Text>
+            <EmptySearch />
           ) : (
-            <Text>Oops! Unable to return list of all countries!</Text>
+            <ErrorScreen
+              error="Oops! Unable to return list of all countries!"
+              retryFunction={fetchCountries}
+            />
           )}
         </View>
       )}
