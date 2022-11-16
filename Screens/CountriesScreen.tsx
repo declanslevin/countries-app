@@ -95,7 +95,7 @@ const CountriesScreen = () => {
   }, [navigation]);
 
   useEffect(() => {
-    // fetchCountries();
+    fetchCountries();
   }, []);
 
   useEffect(() => {
@@ -168,7 +168,7 @@ const CountriesScreen = () => {
             <EmptySearch />
           ) : (
             <ErrorScreen
-              error="Oops! Unable to return list of all countries!"
+              error="Unable to return list of all countries!"
               retryFunction={fetchCountries}
             />
           )}
