@@ -2,20 +2,28 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CountryType } from '../types';
 
 const storeData = async (key: string, value: CountryType[]) => {
+  let result;
   try {
     const jsonValue = JSON.stringify(value);
-    await AsyncStorage.setItem(key, jsonValue);
+    result = await AsyncStorage.setItem(key, jsonValue);
   } catch (err) {
-    console.log(err);
+    result = null;
+    console.log('storeData failed', err);
+  } finally {
+    return result;
   }
 };
 
 const getData = async (key: string) => {
+  let result;
   try {
     const jsonValue = await AsyncStorage.getItem(key);
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
+    result = jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (err) {
-    console.log(err);
+    result = null;
+    console.log('getData failed', err);
+  } finally {
+    return result;
   }
 };
 

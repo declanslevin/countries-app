@@ -62,7 +62,10 @@ const CountriesScreen = () => {
 
   const fetchCountries = async () => {
     const local = await getAllCountries();
-    if (Object.values(local).every((val) => val === 0 || val === null)) {
+    if (
+      !local ||
+      Object.values(local).every((val) => val === 0 || val === null)
+    ) {
       const result = await fetchAllCountries();
       const countries = result.map((country: CountryDataType) => {
         return {

@@ -6,7 +6,7 @@ const fetchAllCountries = async () => {
     fetch(request)
       .then((res) => res.json())
       .then((data) => data)
-      .catch((err) => console.log(err))
+      .catch((err) => console.log('fetchAllCountries failed', err))
   );
   return result;
 };
