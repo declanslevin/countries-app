@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { CountriesScreen } from './Screens/CountriesScreen';
 import { CountryScreen } from './Screens/CountryScreen';
 import { RootStackParamList } from './types';
-import { Text, Dimensions } from 'react-native';
+import { Text, Dimensions, View, Button } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MapView from 'react-native-maps';
 import { Entypo } from '@expo/vector-icons';
@@ -12,6 +12,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SavedCountriesProvider } from './lib/countriesState';
 import { VisitedScreen } from './Screens/VisitedScreen';
 import { WishlistScreen } from './Screens/WishlistScreen';
+import { clearAll } from './lib/localStorage';
+import { DebugTab } from './Screens/DebugScreen';
 
 const StackNav = createStackNavigator<RootStackParamList>();
 const TabNav = createBottomTabNavigator();
@@ -167,6 +169,7 @@ export default function App() {
               ),
             }}
           />
+          <TabNav.Screen name="Debug" component={DebugTab} />
         </TabNav.Navigator>
       </NavigationContainer>
     </SavedCountriesProvider>

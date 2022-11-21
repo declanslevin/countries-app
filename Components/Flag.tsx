@@ -5,6 +5,8 @@ import styled from 'styled-components/native';
 interface FlagProps {
   source: string;
   style: {};
+  height?: number;
+  width?: number;
   resize?: string;
   avatar?: boolean;
 }
@@ -42,7 +44,7 @@ const FlagContainer = ({ avatar, children }: ContainerProps) => {
   );
 };
 
-const Flag = ({ source, resize, avatar, style }: FlagProps) => {
+const Flag = ({ source, height, width, resize, avatar, style }: FlagProps) => {
   const [imgDimensions, setImgDimensions] = useState(
     avatar
       ? { width: 75, height: 50 }
@@ -51,19 +53,38 @@ const Flag = ({ source, resize, avatar, style }: FlagProps) => {
           height: 240,
         }
   );
-  Image.getSize(source, (width, height) => {
-    if (avatar) {
-      width > 75
-        ? setImgDimensions({ width: 75, height: 75 * (height / width) })
-        : setImgDimensions({ height: 50, width: 50 * (width / height) });
-    } else {
-      setImgDimensions(
-        width > 320
-          ? { width: 320, height: 320 * (height / width) }
-          : { width, height }
-      );
-    }
-  });
+  if (height && width) {
+    setImgDimensions({ width: width, height: height });
+  } else if (height && !width) {
+    Image.getSize(source, (imgWidth, imgHeight) => {
+      setImgDimensions({
+        width: height * (imgWidth / imgHeight),
+        height: imgHeight,
+      });
+    });
+  } else if (width && height) {
+    Image.getSize(source, (imgWidth, imgHeight) => {
+      setImgDimensions({
+        width: imgWidth,
+        height: width * (imgHeight / imgWidth),
+      });
+    });
+  } else {
+    Image.getSize(source, (width, height) => {
+      if (avatar) {
+        width > 75
+          ? setImgDimensions({ width: 75, height: 75 * (height / width) })
+          : setImgDimensions({ height: 50, width: 50 * (width / height) });
+      } else {
+        setImgDimensions(
+          width > 320
+            ? { width: 320, height: 320 * (height / width) }
+            : { width, height }
+        );
+      }
+    });
+  }
+
   return (
     <FlagContainer avatar={avatar}>
       <StyledFlag

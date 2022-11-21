@@ -1,13 +1,23 @@
-import { Button, Linking, Alert, Image, Dimensions } from 'react-native';
+import {
+  Button,
+  Linking,
+  Alert,
+  Image,
+  Dimensions,
+  View,
+  Pressable,
+  Modal,
+} from 'react-native';
 import styled from 'styled-components/native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { RootStackParamList } from '../types';
-import React, { useCallback, useState } from 'react';
+import { CountryType, RootStackParamList } from '../types';
+import React, { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MapView from 'react-native-maps';
 import { ScrollView } from 'react-native-gesture-handler';
 import Geocoder from 'react-native-geocoding';
 import Constants from 'expo-constants';
+import { useSavedCountries } from '../lib/countriesState';
 
 type CountryScreenRouteProp = RouteProp<RootStackParamList, 'Country'>;
 
@@ -46,17 +56,38 @@ const ButtonContainer = styled.View`
   margin: 16px 16px 0;
 `;
 
-const Flag = ({ source, resize }: { source: string; resize: string }) => {
+const Flag = ({
+  height,
+  source,
+  resize,
+}: {
+  height?: number;
+  source: string;
+  resize: string;
+}) => {
   const [imgDimensions, setImgDimensions] = useState({
     width: 320,
     height: 240,
   });
-  Image.getSize(source, (width, height) => {
-    const ratio = height / width;
-    setImgDimensions(
-      width > 320 ? { width: 320, height: 320 * ratio } : { width, height }
-    );
-  });
+
+  useEffect(() => {
+    if (height) {
+      Image.getSize(source, (imgWidth, imgHeight) => {
+        setImgDimensions({
+          width: height * (imgWidth / imgHeight),
+          height: height,
+        });
+      });
+    } else {
+      Image.getSize(source, (width, height) => {
+        const ratio = height / width;
+        setImgDimensions(
+          width > 320 ? { width: 320, height: 320 * ratio } : { width, height }
+        );
+      });
+    }
+  }, []);
+
   return (
     <StyledFlag
       source={{ uri: source }}
@@ -92,6 +123,7 @@ const CountryScreen = () => {
     population,
     capital,
     continents,
+    name,
     map,
     latitude,
     longitude,
@@ -101,6 +133,22 @@ const CountryScreen = () => {
   const [latDelta, setLatDelta] = useState<number>();
   const [lngDelta, setLngDelta] = useState<number>();
 
+  const [isVisited, setIsVisited] = useState<boolean>();
+  const [isWishlist, setIsWishlist] = useState<boolean>();
+  const [thisCountry, setThisCountry] = useState<CountryType>();
+
+  const [flagModalVisible, setFlagModalVisible] = useState<boolean>(false);
+
+  const {
+    addToVisited,
+    addToWishlist,
+    getCountryFromAll,
+    removeFromVisited,
+    removeFromWishlist,
+    visitedCountries,
+    wishlistCountries,
+  } = useSavedCountries();
+
   const GOOGLE_MAPS_API_KEY = Constants.expoConfig?.extra?.googleMapsApiKey;
   Geocoder.init(GOOGLE_MAPS_API_KEY);
   Geocoder.from(route.params.name)
@@ -108,7 +156,7 @@ const CountryScreen = () => {
       const location = json.results[0].geometry.location;
       const viewport = json.results[0].geometry.viewport;
       const bounds = json.results[0].geometry.bounds;
-      console.log(bounds);
+      // console.log(bounds);
       setLat(location.lat);
       setLng(location.lng);
       setLatDelta(viewport.northeast.lat - viewport.southwest.lat);
@@ -116,14 +164,56 @@ const CountryScreen = () => {
     })
     .catch((err) => console.warn(err));
 
+  useEffect(() => {
+    setThisCountry(getCountryFromAll(name));
+  }, []);
+
+  useEffect(() => {
+    visitedCountries.filter((country) => country.name === name).length
+      ? setIsVisited(true)
+      : setIsVisited(false);
+    wishlistCountries.filter((country) => country.name === name).length
+      ? setIsWishlist(true)
+      : setIsWishlist(false);
+  }, [visitedCountries, wishlistCountries]);
+
   return (
     <ScreenContainer>
       <SafeAreaView edges={['bottom', 'left', 'right']} style={{ flex: 1 }}>
+        <Modal
+          animationType="fade"
+          visible={flagModalVisible}
+          transparent={true}
+          onRequestClose={() => {
+            setFlagModalVisible(!flagModalVisible);
+          }}
+        >
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').height,
+              backgroundColor: 'rgba(0,0,0,0.7)',
+            }}
+          >
+            <View style={{ marginBottom: 16 }}>
+              <Flag source={flag} resize="contain" />
+            </View>
+            <Button
+              title="Close"
+              onPress={() => {
+                setFlagModalVisible(false);
+              }}
+            />
+          </View>
+        </Modal>
         <ScrollView style={{ marginBottom: 20 }}>
           <MapView
             style={{
               width: Dimensions.get('window').width,
               height: Dimensions.get('window').height / 3,
+              marginBottom: 12,
             }}
             region={{
               latitude: lat,
@@ -132,8 +222,61 @@ const CountryScreen = () => {
               longitudeDelta: lngDelta || 5,
             }}
           />
-          <FlagContainer>
-            <Flag source={flag} resize="contain" />
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              marginBottom: 8,
+              paddingHorizontal: 16,
+            }}
+          >
+            <View style={{ flex: 1, marginRight: 8 }}>
+              {isVisited ? (
+                <Button
+                  title="Remove from Visited"
+                  onPress={() => {
+                    removeFromVisited(thisCountry);
+                  }}
+                />
+              ) : (
+                <Button
+                  title="Add to Visited"
+                  onPress={() => {
+                    addToVisited(thisCountry);
+                  }}
+                />
+              )}
+            </View>
+            <View style={{ flex: 1 }}>
+              {isWishlist ? (
+                <Button
+                  title="Remove from Wishlist"
+                  onPress={() => {
+                    removeFromWishlist(thisCountry);
+                  }}
+                />
+              ) : (
+                <Button
+                  title="Add to Wishlist"
+                  onPress={() => {
+                    addToWishlist(thisCountry);
+                  }}
+                />
+              )}
+            </View>
+          </View>
+          <FlagContainer
+            style={{ flexDirection: 'row', paddingHorizontal: 16 }}
+          >
+            <TextLabel>Flag: </TextLabel>
+            <Pressable
+              onPress={() => {
+                setFlagModalVisible(true);
+              }}
+            >
+              <Flag source={flag} height={32} resize="contain" />
+            </Pressable>
           </FlagContainer>
           <TextContainer>
             <TextLabel>Official Name: </TextLabel>

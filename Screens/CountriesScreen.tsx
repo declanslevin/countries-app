@@ -53,6 +53,7 @@ const CountriesScreen = () => {
   const { promiseInProgress } = usePromiseTracker();
 
   const {
+    addAllCountries,
     clearSelected,
     selectedCountries,
     visitedCountries,
@@ -84,12 +85,15 @@ const CountriesScreen = () => {
         a.name.localeCompare(b.name)
       );
       setAllCountries(sortedCountries);
+      addAllCountries(sortedCountries);
       await storeAllCountries(sortedCountries);
     } else {
       setAllCountries(local);
+      addAllCountries(local);
     }
   };
 
+  //  let initialRender = true;
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       clearSelected();
@@ -98,6 +102,7 @@ const CountriesScreen = () => {
   }, [navigation]);
 
   useEffect(() => {
+    // initialRender = false;
     fetchCountries();
   }, []);
 
@@ -108,6 +113,7 @@ const CountriesScreen = () => {
   }, [allCountries]);
 
   useEffect(() => {
+    // if (!initialRender) {
     if (!visitedActive && !wishlistActive) {
       setCountriesList(allCountries);
     } else if (visitedActive && !wishlistActive) {
@@ -127,9 +133,11 @@ const CountriesScreen = () => {
         )
       );
     }
+    // }
   }, [wishlistActive, visitedActive]);
 
   useEffect(() => {
+    // if (!initialRender) {
     if (searchTerm && countriesList) {
       const search = countriesList.filter(
         (country) =>
@@ -146,6 +154,7 @@ const CountriesScreen = () => {
       setSearchCountries([]);
       setNoCountriesFound(false);
     }
+    // }
   }, [searchTerm]);
 
   return (
@@ -161,6 +170,20 @@ const CountriesScreen = () => {
         <Spinner />
       ) : (
         <View style={{ flex: 1, width: '100%' }}>
+          {/* {!countriesList ? (
+            <ErrorScreen
+              error="Unable to return list of all countries!"
+              retryFunction={fetchCountries}
+            />
+          ) : noCountriesFound ? (
+            <EmptySearch />
+          ) : (
+            <CountriesList
+              countriesList={
+                !searchCountries.length ? countriesList : searchCountries
+              }
+            />
+          )} */}
           {countriesList && !noCountriesFound ? (
             <CountriesList
               countriesList={

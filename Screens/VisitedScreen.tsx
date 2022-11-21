@@ -7,7 +7,10 @@ import { Pressable, Text, View } from 'react-native';
 import { useSavedCountries } from '../lib/countriesState';
 import { useNavigation } from '@react-navigation/native';
 import { AddRemoveButtons } from '../Components/AddRemoveButtons';
-import { getVisitedCountries } from '../lib/localStorage';
+import {
+  getVisitedCountries,
+  storeVisitedCountries,
+} from '../lib/localStorage';
 import { NoCountries } from '../Components/NoCountries';
 import { EmptySearch } from '../Components/EmptySearch';
 
@@ -32,11 +35,15 @@ const VisitedScreen = () => {
 
   const fetchVisitedCountries = async () => {
     const local = await getVisitedCountries();
-    if (Object.values(local).every((val) => val === 0 || val === null)) {
+    if (
+      !local ||
+      Object.values(local).every((val) => val === 0 || val === null)
+    ) {
       setCountriesList(visitedCountries);
     } else {
       setCountriesList(local);
     }
+    // await storeVisitedCountries(visitedCountries);
   };
 
   useEffect(() => {
@@ -46,8 +53,15 @@ const VisitedScreen = () => {
     return unsubscribe;
   }, [navigation]);
 
+  let initialRender = true;
   useEffect(() => {
-    fetchVisitedCountries();
+    if (initialRender) {
+      fetchVisitedCountries();
+      initialRender = false;
+    } else {
+      setCountriesList(visitedCountries);
+      storeVisitedCountries(visitedCountries);
+    }
   }, [visitedCountries]);
 
   useEffect(() => {

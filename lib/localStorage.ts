@@ -27,6 +27,14 @@ const getData = async (key: string) => {
   }
 };
 
+const removeData = async (key: string) => {
+  try {
+    await AsyncStorage.removeItem(key);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const storeAllCountries = (countries: CountryType[]) => {
   return storeData('allCountries', countries);
 };
@@ -51,10 +59,21 @@ const getWishlistCountries = () => {
   return getData('wishlistCountries');
 };
 
+// For debug
+const clearAll = async () => {
+  try {
+    await AsyncStorage.clear();
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 export {
+  clearAll,
   getAllCountries,
   getVisitedCountries,
   getWishlistCountries,
+  // removeFromVisitedCountries,
   storeAllCountries,
   storeVisitedCountries,
   storeWishlistCountries,

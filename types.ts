@@ -15,6 +15,7 @@ type RootStackParamList = {
   Wishlist: undefined;
   Countries: undefined;
   Country: CountryType;
+  Debug: undefined;
 };
 
 export { CountryType, RootStackParamList };
