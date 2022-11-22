@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { AddRemoveButtons } from '../Components/AddRemoveButtons';
-import { CountriesList } from '../Components/CountriesList';
-import { Filter } from '../Components/Filter';
-import { Search } from '../Components/Search';
-import { Spinner } from '../Components/Spinner';
-import { fetchAllCountries } from '../lib/requests';
-import { useSavedCountries } from '../lib/countriesState';
-import { getAllCountries, storeAllCountries } from '../lib/localStorage';
-import { CountryType } from '../types';
-import styled from 'styled-components/native';
-import { usePromiseTracker } from 'react-promise-tracker';
-import { EmptySearch } from '../Components/EmptySearch';
-import { ErrorScreen } from '../Components/Error';
+import { useEffect, useState } from "react";
+import { View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { AddRemoveButtons } from "../Components/AddRemoveButtons";
+import { CountriesList } from "../Components/CountriesList";
+import { Filter } from "../Components/Filter";
+import { Search } from "../Components/Search";
+import { Spinner } from "../Components/Spinner";
+import { fetchAllCountries } from "../lib/requests";
+import { useSavedCountries } from "../lib/countriesState";
+import { getAllCountries, storeAllCountries } from "../lib/localStorage";
+import { CountryType } from "../types";
+import styled from "styled-components/native";
+import { usePromiseTracker } from "react-promise-tracker";
+import { EmptySearch } from "../Components/EmptySearch";
+import { ErrorScreen } from "../Components/Error";
 
 interface CountryDataType {
   name: {
@@ -40,15 +40,12 @@ const ScreenContainer = styled.SafeAreaView`
 
 const CountriesScreen = () => {
   const [allCountries, setAllCountries] = useState<CountryType[]>();
-  const [countriesList, setCountriesList] = useState<CountryType[]>();
 
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchCountries, setSearchCountries] = useState<CountryType[]>([]);
 
   const [visitedActive, setVisitedActive] = useState<boolean>(false);
   const [wishlistActive, setWishlistActive] = useState<boolean>(false);
-
-  const [noCountriesFound, setNoCountriesFound] = useState<boolean>(false);
 
   const { promiseInProgress } = usePromiseTracker();
 
@@ -95,7 +92,7 @@ const CountriesScreen = () => {
 
   //  let initialRender = true;
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
+    const unsubscribe = navigation.addListener("focus", () => {
       clearSelected();
     });
     return unsubscribe;
@@ -106,56 +103,22 @@ const CountriesScreen = () => {
     fetchCountries();
   }, []);
 
-  useEffect(() => {
-    if (!countriesList) {
-      setCountriesList(allCountries);
-    }
-  }, [allCountries]);
+  const countriesList = (allCountries || [])
+    // filters out the visited, if active
+    .filter((country) => !visitedActive || !visitedCountries.includes(country))
+    // filters out the wishlist, if active
+    .filter(
+      (country) => !wishlistActive || !wishlistCountries.includes(country)
+    )
+    // filters based on search term, if there is one
+    .filter(
+      (country) =>
+        !searchTerm ||
+        country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        country.official.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-  useEffect(() => {
-    // if (!initialRender) {
-    if (!visitedActive && !wishlistActive) {
-      setCountriesList(allCountries);
-    } else if (visitedActive && !wishlistActive) {
-      setCountriesList(
-        allCountries?.filter((country) => !visitedCountries.includes(country))
-      );
-    } else if (!visitedActive && wishlistActive) {
-      setCountriesList(
-        allCountries?.filter((country) => !wishlistCountries.includes(country))
-      );
-    } else if (visitedActive && wishlistActive) {
-      setCountriesList(
-        allCountries?.filter(
-          (country) =>
-            !visitedCountries.includes(country) &&
-            !wishlistCountries.includes(country)
-        )
-      );
-    }
-    // }
-  }, [wishlistActive, visitedActive]);
-
-  useEffect(() => {
-    // if (!initialRender) {
-    if (searchTerm && countriesList) {
-      const search = countriesList.filter(
-        (country) =>
-          country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          country.official.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      if (search.length) {
-        setSearchCountries(search);
-        setNoCountriesFound(false);
-      } else {
-        setNoCountriesFound(true);
-      }
-    } else {
-      setSearchCountries([]);
-      setNoCountriesFound(false);
-    }
-    // }
-  }, [searchTerm]);
+  const noCountriesFound = !countriesList.length;
 
   return (
     <ScreenContainer>
@@ -169,7 +132,7 @@ const CountriesScreen = () => {
       {promiseInProgress ? (
         <Spinner />
       ) : (
-        <View style={{ flex: 1, width: '100%' }}>
+        <View style={{ flex: 1, width: "100%" }}>
           {/* {!countriesList ? (
             <ErrorScreen
               error="Unable to return list of all countries!"
