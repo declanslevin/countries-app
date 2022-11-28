@@ -33,7 +33,7 @@ const ScreenContainer = styled.View`
 
 const FlagContainer = styled.View`
   align-items: center;
-  padding-bottom: 16px;
+  padding-bottom: 8px;
 `;
 
 const StyledFlag = styled.Image<StyledFlagProps>`

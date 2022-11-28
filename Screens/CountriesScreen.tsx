@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
-import { View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { AddRemoveButtons } from "../Components/AddRemoveButtons";
-import { CountriesList } from "../Components/CountriesList";
-import { Filter } from "../Components/Filter";
-import { Search } from "../Components/Search";
-import { Spinner } from "../Components/Spinner";
-import { fetchAllCountries } from "../lib/requests";
-import { useSavedCountries } from "../lib/countriesState";
-import { getAllCountries, storeAllCountries } from "../lib/localStorage";
-import { CountryType } from "../types";
-import styled from "styled-components/native";
-import { usePromiseTracker } from "react-promise-tracker";
-import { EmptySearch } from "../Components/EmptySearch";
-import { ErrorScreen } from "../Components/Error";
+import { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { AddRemoveButtons } from '../Components/AddRemoveButtons';
+import { CountriesList } from '../Components/CountriesList';
+import { Filter } from '../Components/Filter';
+import { Search } from '../Components/Search';
+import { Spinner } from '../Components/Spinner';
+import { fetchAllCountries } from '../lib/requests';
+import { useSavedCountries } from '../lib/countriesState';
+import { getAllCountries, storeAllCountries } from '../lib/localStorage';
+import { CountryType } from '../types';
+import styled from 'styled-components/native';
+import { usePromiseTracker } from 'react-promise-tracker';
+import { EmptySearch } from '../Components/EmptySearch';
+import { ErrorScreen } from '../Components/Error';
 
 interface CountryDataType {
   name: {
@@ -39,10 +39,7 @@ const ScreenContainer = styled.SafeAreaView`
 `;
 
 const CountriesScreen = () => {
-  const [allCountries, setAllCountries] = useState<CountryType[]>();
-
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [searchCountries, setSearchCountries] = useState<CountryType[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const [visitedActive, setVisitedActive] = useState<boolean>(false);
   const [wishlistActive, setWishlistActive] = useState<boolean>(false);
@@ -52,6 +49,7 @@ const CountriesScreen = () => {
   const {
     addAllCountries,
     clearSelected,
+    allCountries,
     selectedCountries,
     visitedCountries,
     wishlistCountries,
@@ -81,25 +79,21 @@ const CountriesScreen = () => {
       const sortedCountries = countries.sort((a: CountryType, b: CountryType) =>
         a.name.localeCompare(b.name)
       );
-      setAllCountries(sortedCountries);
       addAllCountries(sortedCountries);
       await storeAllCountries(sortedCountries);
     } else {
-      setAllCountries(local);
       addAllCountries(local);
     }
   };
 
-  //  let initialRender = true;
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
+    const unsubscribe = navigation.addListener('focus', () => {
       clearSelected();
     });
     return unsubscribe;
   }, [navigation]);
 
   useEffect(() => {
-    // initialRender = false;
     fetchCountries();
   }, []);
 
@@ -132,27 +126,9 @@ const CountriesScreen = () => {
       {promiseInProgress ? (
         <Spinner />
       ) : (
-        <View style={{ flex: 1, width: "100%" }}>
-          {/* {!countriesList ? (
-            <ErrorScreen
-              error="Unable to return list of all countries!"
-              retryFunction={fetchCountries}
-            />
-          ) : noCountriesFound ? (
-            <EmptySearch />
-          ) : (
-            <CountriesList
-              countriesList={
-                !searchCountries.length ? countriesList : searchCountries
-              }
-            />
-          )} */}
+        <View style={{ flex: 1, width: '100%' }}>
           {countriesList && !noCountriesFound ? (
-            <CountriesList
-              countriesList={
-                !searchCountries.length ? countriesList : searchCountries
-              }
-            />
+            <CountriesList countriesList={countriesList} />
           ) : noCountriesFound ? (
             <EmptySearch />
           ) : (
