@@ -14,6 +14,7 @@ import { VisitedScreen } from './Screens/VisitedScreen';
 import { WishlistScreen } from './Screens/WishlistScreen';
 import { clearAll } from './lib/localStorage';
 import { DebugTab } from './Screens/DebugScreen';
+import { MapScreen } from './Screens/MapScreen';
 
 const StackNav = createStackNavigator<RootStackParamList>();
 const TabNav = createBottomTabNavigator();
@@ -89,17 +90,17 @@ const WishlistTab = () => (
   </StackNav.Navigator>
 );
 
-const MapTab = () => (
-  <SafeAreaView>
-    <Text>Hello world</Text>
-    <MapView
-      style={{
-        width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height - 150,
-      }}
-    />
-  </SafeAreaView>
-);
+// const MapTab = () => (
+//   <SafeAreaView>
+//     <Text>Hello world</Text>
+//     <MapView
+//       style={{
+//         width: Dimensions.get('window').width,
+//         height: Dimensions.get('window').height - 150,
+//       }}
+//     />
+//   </SafeAreaView>
+// );
 
 export default function App() {
   return (
@@ -158,7 +159,7 @@ export default function App() {
           />
           <TabNav.Screen
             name="Map"
-            component={MapTab}
+            component={MapScreen}
             options={{
               tabBarIcon: ({ focused }) => (
                 <Entypo

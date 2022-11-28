@@ -4,6 +4,7 @@
     "strict": true,
     "types": [
       "@types/styled-components-react-native"
-    ]
+    ],
+    "resolveJsonModule": true,
   }
 }
